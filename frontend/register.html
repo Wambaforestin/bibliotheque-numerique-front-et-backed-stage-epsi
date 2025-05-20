@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inscription - Bibliothèque Numérique</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+    }
+    .register-card {
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+    .register-card:hover {
+      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.15);
+    }
+    .input-field {
+      transition: all 0.3s ease;
+      border: 1px solid #e2e8f0;
+    }
+    .input-field:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+    .btn-register {
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+    }
+    .btn-register:hover {
+      transform: translateY(-2px);
+    }
+    .fade-in {
+      animation: fadeIn 0.6s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .password-strength {
+      height: 4px;
+      transition: all 0.3s ease;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center px-4 py-8">
+  <!-- Carte d'inscription -->
+  <div class="register-card w-full max-w-md bg-white rounded-xl overflow-hidden fade-in">
+    <!-- En-tête -->
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 py-6 px-8">
+      <div class="flex items-center justify-center space-x-3">
+        <i class="fas fa-user-plus text-white text-2xl"></i>
+        <h2 class="text-2xl font-bold text-white">Créer un compte</h2>
+      </div>
+      <p class="text-center text-blue-100 mt-1">Rejoignez notre plateforme éducative</p>
+    </div>
+    
+    <!-- Corps du formulaire -->
+    <div class="p-8">
+      <form id="registerForm" class="space-y-5">
+        <!-- Champ Email -->
+        <div class="space-y-1">
+          <label for="email" class="block text-sm font-medium text-gray-700">Email académique</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-envelope text-gray-400"></i>
+            </div>
+            <input 
+              id="email" 
+              name="email" 
+              type="email" 
+              placeholder="prenom.nom@lycee.fr" 
+              required
+              pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+              class="input-field pl-10 w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
+            >
+          </div>
+        </div>
+        
+        <!-- Champ Mot de passe -->
+        <div class="space-y-1">
+          <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-lock text-gray-400"></i>
+            </div>
+            <input 
+              id="password" 
+              name="password" 
+              type="password" 
+              placeholder="••••••••" 
+              required
+              minlength="8"
+              class="input-field pl-10 w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
+              oninput="checkPasswordStrength(this.value)"
+            >
+          </div>
+          <!-- Indicateur de force du mot de passe -->
+          <div class="flex mt-1 space-x-1">
+            <div id="strength-1" class="password-strength w-1/4 bg-gray-200 rounded"></div>
+            <div id="strength-2" class="password-strength w-1/4 bg-gray-200 rounded"></div>
+            <div id="strength-3" class="password-strength w-1/4 bg-gray-200 rounded"></div>
+            <div id="strength-4" class="password-strength w-1/4 bg-gray-200 rounded"></div>
+          </div>
+          <p id="password-hint" class="text-xs text-gray-500 mt-1">
+            Minimum 8 caractères avec majuscule, minuscule et chiffre
+          </p>
+        </div>
+        
+        <!-- Confirmation Mot de passe -->
+        <div class="space-y-1">
+          <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirmer le mot de passe</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-lock text-gray-400"></i>
+            </div>
+            <input 
+              id="confirm-password" 
+              type="password" 
+              placeholder="••••••••" 
+              required
+              class="input-field pl-10 w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
+              oninput="checkPasswordMatch()"
+            >
+          </div>
+          <p id="password-match" class="text-xs mt-1 hidden"></p>
+        </div>
+        
+        <!-- Sélecteur de rôle -->
+        <div class="space-y-1">
+          <label for="role" class="block text-sm font-medium text-gray-700">Vous êtes</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-user-tag text-gray-400"></i>
+            </div>
+            <select 
+              id="role" 
+              name="role" 
+              class="input-field pl-10 w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 appearance-none"
+            >
+              <option value="eleve">Élève</option>
+              <option value="enseignant">Enseignant</option>
+              <option value="admin">Administrateur</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Conditions d'utilisation -->
+        <div class="flex items-start">
+          <div class="flex items-center h-5">
+            <input 
+              id="terms" 
+              name="terms" 
+              type="checkbox" 
+              required
+              class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+            >
+          </div>
+          <div class="ml-3 text-sm">
+            <label for="terms" class="font-medium text-gray-700">
+              J'accepte les <a href="#" class="text-blue-600 hover:underline">conditions d'utilisation</a>
+            </label>
+          </div>
+        </div>
+        
+        <!-- Bouton d'inscription -->
+        <button 
+          type="submit" 
+          id="submitBtn"
+          class="btn-register w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-md"
+        >
+          <i class="fas fa-user-plus mr-2"></i>S'inscrire
+        </button>
+      </form>
+      
+      <!-- Message de statut -->
+      <div id="message" class="mt-4 text-sm p-3 rounded hidden"></div>
+      
+      <!-- Lien de connexion -->
+      <div class="mt-6 text-center">
+        <p class="text-sm text-gray-600">Déjà inscrit ? 
+          <a href="login.html" class="text-blue-600 font-medium hover:underline">Se connecter</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Vérification de la force du mot de passe
+    function checkPasswordStrength(password) {
+      const strengthBars = [
+        document.getElementById('strength-1'),
+        document.getElementById('strength-2'),
+        document.getElementById('strength-3'),
+        document.getElementById('strength-4')
+      ];
+      
+      // Réinitialiser
+      strengthBars.forEach(bar => {
+        bar.style.backgroundColor = '#e5e7eb';
+      });
+      
+      let strength = 0;
+      
+      // Longueur minimale
+      if (password.length >= 8) strength++;
+      // Contient des chiffres
+      if (/\d/.test(password)) strength++;
+      // Contient des lettres minuscules et majuscules
+      if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+      // Contient des caractères spéciaux
+      if (/[^a-zA-Z0-9]/.test(password)) strength++;
+      
+      // Mettre à jour les barres de force
+      for (let i = 0; i < strength; i++) {
+        let color;
+        if (strength === 1) color = '#ef4444'; // rouge
+        else if (strength === 2) color = '#f59e0b'; // orange
+        else if (strength === 3) color = '#3b82f6'; // bleu
+        else if (strength === 4) color = '#10b981'; // vert
+        
+        strengthBars[i].style.backgroundColor = color;
+      }
+    }
+    
+    // Vérification de la correspondance des mots de passe
+    function checkPasswordMatch() {
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+      const matchMessage = document.getElementById('password-match');
+      
+      if (confirmPassword.length === 0) {
+        matchMessage.classList.add('hidden');
+        return;
+      }
+      
+      if (password === confirmPassword) {
+        matchMessage.textContent = 'Les mots de passe correspondent';
+        matchMessage.classList.remove('text-red-500', 'hidden');
+        matchMessage.classList.add('text-green-500');
+      } else {
+        matchMessage.textContent = 'Les mots de passe ne correspondent pas';
+        matchMessage.classList.remove('text-green-500', 'hidden');
+        matchMessage.classList.add('text-red-500');
+      }
+    }
+    
+    // Gestion du formulaire
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('registerForm');
+      const messageDiv = document.getElementById('message');
+      
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Vérifier la correspondance des mots de passe
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+        
+        if (password !== confirmPassword) {
+          messageDiv.textContent = 'Les mots de passe ne correspondent pas';
+          messageDiv.classList.remove('hidden', 'bg-green-50', 'text-green-700');
+          messageDiv.classList.add('bg-red-50', 'text-red-700');
+          return;
+        }
+        
+        // Afficher le statut de chargement
+        const submitBtn = document.getElementById('submitBtn');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Enregistrement...';
+        submitBtn.disabled = true;
+        
+        // Préparer les données
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        
+        try {
+          const res = await fetch('http://localhost:8000/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          
+          const result = await res.json();
+          
+          if (res.ok) {
+            messageDiv.textContent = result.msg || 'Inscription réussie ! Redirection...';
+            messageDiv.classList.remove('hidden', 'bg-red-50', 'text-red-700');
+            messageDiv.classList.add('bg-green-50', 'text-green-700');
+            
+            // Redirection après 2 secondes
+            setTimeout(() => {
+              window.location.href = 'login.html';
+            }, 2000);
+          } else {
+            messageDiv.textContent = result.detail || "Erreur lors de l'inscription";
+            messageDiv.classList.remove('hidden', 'bg-green-50', 'text-green-700');
+            messageDiv.classList.add('bg-red-50', 'text-red-700');
+          }
+        } catch (error) {
+          console.error('Erreur:', error);
+          messageDiv.textContent = 'Erreur de connexion au serveur';
+          messageDiv.classList.remove('hidden', 'bg-green-50', 'text-green-700');
+          messageDiv.classList.add('bg-red-50', 'text-red-700');
+        } finally {
+          submitBtn.innerHTML = originalBtnText;
+          submitBtn.disabled = false;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

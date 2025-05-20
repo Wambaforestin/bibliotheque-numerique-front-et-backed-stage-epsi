@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Explorer les livres</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- 🔁 Navbar -->
+  <div id="navbar" class="w-full"></div>
+
+  <!-- ✅ Contenu principal -->
+  <main class="max-w-6xl mx-auto p-6">
+    <div class="mb-6">
+      <h1 class="text-3xl font-bold text-blue-800 mb-2">📚 Livres disponibles</h1>
+      <input id="searchInput" type="text" placeholder="🔍 Rechercher un livre..." class="border w-full p-3 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+    </div>
+
+    <div id="bookList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="navbar.js"></script>
+  <script>
+    const token = localStorage.getItem("token");
+    if (!token) window.location.href = "login.html";
+
+    async function fetchBooks(query = "") {
+      const res = await fetch(`http://localhost:8000/books/search?title=${query}`);
+      const books = await res.json();
+      displayBooks(books);
+    }
+
+    function displayBooks(books) {
+      const list = document.getElementById("bookList");
+      list.innerHTML = "";
+
+      books.forEach(book => {
+        const filename = book.file_url?.split("/").pop() || "";
+
+        const card = document.createElement("div");
+        card.className = "bg-white p-5 rounded-lg shadow hover:shadow-lg transition";
+
+        card.innerHTML = `
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">${book.title}</h2>
+          <p class="text-sm text-gray-600 mb-2">${book.author} – ${book.category} (${book.niveau})</p>
+          <a href="http://localhost:8000/books/download/${filename}" class="text-blue-600 hover:underline text-sm">📥 Télécharger</a>
+        `;
+
+        list.appendChild(card);
+      });
+    }
+
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+      fetchBooks(e.target.value);
+    });
+
+    fetchBooks(); // initial load
+  </script>
+</body>
+</html>

@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau de bord Admin | Bibliothèque Numérique</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background-color: #f8fafc;
+    }
+    .stat-card {
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    .chart-container {
+      height: 300px;
+    }
+    .fade-in {
+      animation: fadeIn 0.6s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  </style>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="min-h-screen p-4 sm:p-6">
+
+  <!-- Navigation -->
+  <div id="navbar" class="w-full max-w-7xl mx-auto mb-6"></div>
+
+  <!-- Contenu principal -->
+  <div class="max-w-7xl mx-auto fade-in">
+    <!-- En-tête -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
+          <i class="fas fa-tachometer-alt text-blue-600 mr-2"></i>Tableau de bord Administrateur
+        </h1>
+        <p class="text-gray-600 mt-1">Gestion complète de la plateforme</p>
+      </div>
+      <div class="mt-3 sm:mt-0 flex items-center space-x-2">
+        <span id="last-update" class="text-xs text-gray-500"></span>
+        <button onclick="fetchStats()" class="text-blue-600 hover:text-blue-800 text-sm flex items-center">
+          <i class="fas fa-sync-alt mr-1"></i> Actualiser
+        </button>
+      </div>
+    </div>
+
+    <!-- Cartes de statistiques -->
+    <div id="stats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Squelettes de chargement -->
+      <div class="stat-card bg-white p-6 rounded-lg skeleton"></div>
+      <div class="stat-card bg-white p-6 rounded-lg skeleton"></div>
+      <div class="stat-card bg-white p-6 rounded-lg skeleton"></div>
+      <div class="stat-card bg-white p-6 rounded-lg skeleton"></div>
+    </div>
+
+    <!-- Graphiques et données -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <!-- Graphique des livres par catégorie -->
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">
+          <i class="fas fa-bookmark text-blue-500 mr-2"></i>Livres par catégorie
+        </h2>
+        <div class="chart-container">
+          <canvas id="booksByCategoryChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Graphique des utilisateurs -->
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">
+          <i class="fas fa-users text-purple-500 mr-2"></i>Répartition des utilisateurs
+        </h2>
+        <div class="chart-container">
+          <canvas id="usersByRoleChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Activité récente -->
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">
+          <i class="fas fa-history text-green-500 mr-2"></i>Activité récente
+        </h2>
+        <div id="recentActivity" class="space-y-3">
+          <div class="skeleton h-16 rounded"></div>
+          <div class="skeleton h-16 rounded"></div>
+          <div class="skeleton h-16 rounded"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tableau des derniers livres -->
+    <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-800">
+          <i class="fas fa-book-open text-orange-500 mr-2"></i>Derniers livres ajoutés
+        </h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titre</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Auteur</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Catégorie</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="recentBooksTable" class="bg-white divide-y divide-gray-200">
+            <!-- Rempli dynamiquement -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="navbar.js"></script>
+  <script>
+    // Vérification du rôle admin
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      
+      if (!token || role !== "admin") {
+        alert("Accès réservé aux administrateurs.");
+        window.location.href = "index.html";
+        return;
+      }
+
+      fetchStats();
+    });
+
+    // Variables pour les graphiques
+    let booksByCategoryChart, usersByRoleChart;
+
+    // Fonction principale pour récupérer les stats
+    async function fetchStats() {
+      try {
+        const token = localStorage.getItem("token");
+        const headers = { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        };
+
+        // Afficher l'état de chargement
+        document.getElementById('stats').innerHTML = `
+          <div class="stat-card bg-white p-6 rounded-lg skeleton"></div>
+          <div class="stat-card bg-white p-6 rounded-lg skeleton"></div>
+          <div class="stat-card bg-white p-6 rounded-lg skeleton"></div>
+          <div class="stat-card bg-white p-6 rounded-lg skeleton"></div>
+        `;
+
+        document.getElementById('recentActivity').innerHTML = `
+          <div class="skeleton h-16 rounded"></div>
+          <div class="skeleton h-16 rounded"></div>
+          <div class="skeleton h-16 rounded"></div>
+        `;
+
+        document.getElementById('recentBooksTable').innerHTML = `
+          <tr><td colspan="5" class="px-6 py-4 text-center">Chargement...</td></tr>
+        `;
+
+        // Récupérer toutes les données en parallèle
+        const [statsRes, booksRes, usersRes, recentRes, activityRes] = await Promise.all([
+          fetch("http://localhost:8000/stats", { headers }),
+          fetch("http://localhost:8000/books/count", { headers }),
+          fetch("http://localhost:8000/auth/stats", { headers }),
+          fetch("http://localhost:8000/books/recent?limit=5", { headers }),
+          fetch("http://localhost:8000/activity", { headers })
+        ]);
+
+        // Vérifier les réponses
+        if (!statsRes.ok || !booksRes.ok || !usersRes.ok || !recentRes.ok || !activityRes.ok) {
+          throw new Error("Erreur lors de la récupération des données");
+        }
+
+        const stats = await statsRes.json();
+        const totalBooks = await booksRes.json();
+        const userStats = await usersRes.json();
+        const recentBooks = await recentRes.json();
+        const recentActivity = await activityRes.json();
+
+        // Mettre à jour l'heure de dernière actualisation
+        document.getElementById('last-update').textContent = `Dernière actualisation: ${new Date().toLocaleTimeString()}`;
+
+        // Mettre à jour les cartes de stats
+        updateStatCards(stats, totalBooks, userStats);
+        
+        // Mettre à jour les graphiques
+        updateCharts(stats);
+        
+        // Mettre à jour l'activité récente
+        updateRecentActivity(recentActivity);
+        
+        // Mettre à jour le tableau des livres récents
+        updateRecentBooksTable(recentBooks);
+
+      } catch (err) {
+        console.error("Erreur:", err);
+        document.getElementById('stats').innerHTML = `
+          <div class="col-span-full text-center py-10">
+            <i class="fas fa-exclamation-triangle text-yellow-500 text-4xl mb-3"></i>
+            <p class="text-gray-700">Impossible de charger les statistiques</p>
+            <button onclick="fetchStats()" class="mt-3 text-blue-600 hover:underline">
+              <i class="fas fa-sync-alt mr-1"></i>Réessayer
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    // Mettre à jour les cartes de statistiques
+    function updateStatCards(stats, totalBooks, userStats) {
+      document.getElementById('stats').innerHTML = `
+        <div class="stat-card bg-white p-6 rounded-lg">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-700 mb-1">
+                <i class="fas fa-book text-blue-500 mr-2"></i>Livres
+              </h3>
+              <p class="text-3xl font-bold text-blue-600">${totalBooks.count}</p>
+              <p class="text-xs text-gray-500 mt-1">${stats.books_added_this_month} ce mois</p>
+            </div>
+            <div class="bg-blue-100 p-3 rounded-full">
+              <i class="fas fa-book text-blue-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card bg-white p-6 rounded-lg">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-700 mb-1">
+                <i class="fas fa-users text-purple-500 mr-2"></i>Utilisateurs
+              </h3>
+              <p class="text-3xl font-bold text-purple-600">${stats.total_users}</p>
+              <p class="text-xs text-gray-500 mt-1">${stats.new_users_this_month} nouveaux</p>
+            </div>
+            <div class="bg-purple-100 p-3 rounded-full">
+              <i class="fas fa-user-friends text-purple-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card bg-white p-6 rounded-lg">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-700 mb-1">
+                <i class="fas fa-download text-green-500 mr-2"></i>Téléchargements
+              </h3>
+              <p class="text-3xl font-bold text-green-600">${stats.total_downloads}</p>
+              <p class="text-xs text-gray-500 mt-1">${stats.downloads_this_week} cette semaine</p>
+            </div>
+            <div class="bg-green-100 p-3 rounded-full">
+              <i class="fas fa-cloud-download-alt text-green-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card bg-white p-6 rounded-lg">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-700 mb-1">
+                <i class="fas fa-upload text-orange-500 mr-2"></i>Uploads
+              </h3>
+              <p class="text-3xl font-bold text-orange-600">${stats.total_uploads}</p>
+              <p class="text-xs text-gray-500 mt-1">${stats.uploads_this_month} ce mois</p>
+            </div>
+            <div class="bg-orange-100 p-3 rounded-full">
+              <i class="fas fa-cloud-upload-alt text-orange-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Mettre à jour les graphiques
+    function updateCharts(stats) {
+      const booksByCategoryCtx = document.getElementById('booksByCategoryChart').getContext('2d');
+      const usersByRoleCtx = document.getElementById('usersByRoleChart').getContext('2d');
+
+      // Détruire les anciens graphiques s'ils existent
+      if (booksByCategoryChart) booksByCategoryChart.destroy();
+      if (usersByRoleChart) usersByRoleChart.destroy();
+
+      // Graphique des livres par catégorie
+      booksByCategoryChart = new Chart(booksByCategoryCtx, {
+        type: 'bar',
+        data: {
+          labels: stats.books_by_category.labels,
+          datasets: [{
+            label: 'Livres par catégorie',
+            data: stats.books_by_category.data,
+            backgroundColor: [
+              'rgba(79, 70, 229, 0.7)',
+              'rgba(99, 102, 241, 0.7)',
+              'rgba(129, 140, 248, 0.7)',
+              'rgba(165, 180, 252, 0.7)'
+            ],
+            borderColor: [
+              'rgba(79, 70, 229, 1)',
+              'rgba(99, 102, 241, 1)',
+              'rgba(129, 140, 248, 1)',
+              'rgba(165, 180, 252, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+
+      // Graphique des utilisateurs par rôle
+      usersByRoleChart = new Chart(usersByRoleCtx, {
+        type: 'doughnut',
+        data: {
+          labels: stats.users_by_role.labels,
+          datasets: [{
+            data: stats.users_by_role.data,
+            backgroundColor: [
+              'rgba(16, 185, 129, 0.7)',
+              'rgba(59, 130, 246, 0.7)',
+              'rgba(245, 158, 11, 0.7)'
+            ],
+            borderColor: [
+              'rgba(16, 185, 129, 1)',
+              'rgba(59, 130, 246, 1)',
+              'rgba(245, 158, 11, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
+    }
+
+    // Mettre à jour l'activité récente
+    function updateRecentActivity(activities) {
+      const container = document.getElementById('recentActivity');
+      container.innerHTML = '';
+
+      if (activities.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-4 text-gray-500">
+            Aucune activité récente
+          </div>
+        `;
+        return;
+      }
+
+      activities.forEach(activity => {
+        const activityItem = document.createElement('div');
+        activityItem.className = 'flex items-start py-2 border-b border-gray-100 last:border-0';
+        
+        let icon, color;
+        if (activity.type === 'login') {
+          icon = 'fa-sign-in-alt';
+          color = 'text-blue-500';
+        } else if (activity.type === 'download') {
+          icon = 'fa-download';
+          color = 'text-green-500';
+        } else if (activity.type === 'upload') {
+          icon = 'fa-upload';
+          color = 'text-purple-500';
+        } else {
+          icon = 'fa-info-circle';
+          color = 'text-gray-500';
+        }
+
+        activityItem.innerHTML = `
+          <div class="flex-shrink-0 mt-1">
+            <i class="fas ${icon} ${color}"></i>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm font-medium text-gray-900">${activity.description}</p>
+            <p class="text-xs text-gray-500">${new Date(activity.timestamp).toLocaleString()}</p>
+          </div>
+        `;
+
+        container.appendChild(activityItem);
+      });
+    }
+
+    // Mettre à jour le tableau des livres récents
+    function updateRecentBooksTable(books) {
+      const tableBody = document.getElementById('recentBooksTable');
+      tableBody.innerHTML = '';
+
+      if (books.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+              Aucun livre récent
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      books.forEach(book => {
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-50';
+        
+        row.innerHTML = `
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm font-medium text-gray-900">${book.title}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-gray-500">${book.author || 'Inconnu'}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getCategoryColorClass(book.category)}">
+              ${book.category}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            ${new Date(book.created_at).toLocaleDateString()}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <a href="/books/download/${book.file_url.split('/').pop()}" class="text-blue-600 hover:text-blue-900 mr-3">
+              <i class="fas fa-download"></i>
+            </a>
+            <a href="#" class="text-red-600 hover:text-red-900" onclick="confirmDelete('${book.id}')">
+              <i class="fas fa-trash"></i>
+            </a>
+          </td>
+        `;
+
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Fonction utilitaire pour les couleurs de catégorie
+    function getCategoryColorClass(category) {
+      const colors = {
+        'Littérature': 'bg-purple-100 text-purple-800',
+        'Science': 'bg-green-100 text-green-800',
+        'Histoire': 'bg-yellow-100 text-yellow-800',
+        'Mathématiques': 'bg-blue-100 text-blue-800',
+        'Programmation': 'bg-indigo-100 text-indigo-800',
+        'default': 'bg-gray-100 text-gray-800'
+      };
+      return colors[category] || colors.default;
+    }
+
+    // Fonction pour confirmer la suppression
+    window.confirmDelete = function(bookId) {
+      if (confirm("Êtes-vous sûr de vouloir supprimer ce livre ?")) {
+        deleteBook(bookId);
+      }
+    };
+
+    // Fonction pour supprimer un livre
+    async function deleteBook(bookId) {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(`http://localhost:8000/books/${bookId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          alert("Livre supprimé avec succès");
+          fetchStats(); // Actualiser les données
+        } else {
+          const error = await response.json();
+          alert(`Erreur: ${error.detail || 'Échec de la suppression'}`);
+        }
+      } catch (error) {
+        console.error("Erreur:", error);
+        alert("Erreur de connexion au serveur");
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bibliothèque Numérique | Lycée Professionnel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Custom Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              600: '#2563eb',
+              700: '#1d4ed8',
+            },
+            accent: {
+              500: '#8b5cf6',
+              600: '#7c3aed',
+            }
+          },
+          fontFamily: {
+            sans: ['"Open Sans"', 'sans-serif'],
+          },
+          boxShadow: {
+            'soft': '0 4px 14px 0 rgba(0, 0, 0, 0.08)',
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .btn-transition {
+      transition: all 0.3s ease;
+      transform: translateY(0);
+    }
+    .btn-transition:hover {
+      transform: translateY(-2px);
+    }
+    .fade-in {
+      animation: fadeIn 0.8s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-200 min-h-screen font-sans flex flex-col items-center px-4 py-8">
+
+  <!-- 🚀 Enhanced Navbar Placeholder -->
+  <div id="navbar" class="w-full max-w-4xl mb-8"></div>
+
+  <!-- ✨ Main Content Card -->
+  <main class="w-full max-w-lg bg-white rounded-xl shadow-soft overflow-hidden fade-in">
+    <!-- Header with decorative element -->
+    <div class="bg-gradient-to-r from-primary-600 to-accent-500 py-4 px-6">
+      <div class="flex items-center justify-center space-x-3">
+        <i class="fas fa-book-open text-white text-2xl"></i>
+        <h1 class="text-2xl md:text-3xl font-bold text-white">Bibliothèque Numérique</h1>
+      </div>
+      <p class="text-center text-blue-100 mt-1">Lycée Professionnel - Plateforme Éducative</p>
+    </div>
+    
+    <!-- Content Section -->
+    <div class="p-8 space-y-6">
+      <p class="text-gray-600 text-lg">
+        Accédez à notre collection numérique et découvrez des ressources pédagogiques pour votre réussite.
+      </p>
+      
+      <!-- Action Buttons Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <a href="login.html" class="btn-transition bg-primary-600 hover:bg-primary-700 text-white py-3 px-6 rounded-lg flex items-center justify-center space-x-2 shadow-md">
+          <i class="fas fa-sign-in-alt"></i>
+          <span>Se connecter</span>
+        </a>
+        
+        <a href="register.html" class="btn-transition bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg flex items-center justify-center space-x-2 shadow-md">
+          <i class="fas fa-user-plus"></i>
+          <span>Créer un compte</span>
+        </a>
+        
+        <a href="upload.html" class="btn-transition bg-accent-500 hover:bg-accent-600 text-white py-3 px-6 rounded-lg flex items-center justify-center space-x-2 shadow-md">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <span>Uploader un livre</span>
+        </a>
+        
+        <a href="explore.html" class="btn-transition bg-gray-700 hover:bg-gray-800 text-white py-3 px-6 rounded-lg flex items-center justify-center space-x-2 shadow-md">
+          <i class="fas fa-search"></i>
+          <span>Explorer</span>
+        </a>
+      </div>
+    </div>
+    
+    <!-- Footer Note -->
+    <div class="bg-gray-50 px-6 py-4 text-center text-sm text-gray-500 border-t">
+      <p>Besoin d'aide ? <a href="#" class="text-primary-600 hover:underline">Contactez l'administrateur</a></p>
+    </div>
+  </main>
+
+  <!-- 📚 Decorative Book Elements -->
+  <div class="mt-12 flex space-x-6 opacity-50">
+    <i class="fas fa-book text-gray-300 text-3xl"></i>
+    <i class="fas fa-book-reader text-gray-400 text-4xl"></i>
+    <i class="fas fa-bookmark text-gray-300 text-3xl"></i>
+  </div>
+
+  <script src="navbar.js"></script>
+</body>
+</html>

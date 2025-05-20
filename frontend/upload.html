@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uploader un livre | Bibliothèque Numérique</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+    }
+    .upload-card {
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+    .upload-card:hover {
+      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.15);
+    }
+    .input-field {
+      transition: all 0.3s ease;
+      border: 1px solid #e2e8f0;
+    }
+    .input-field:focus {
+      border-color: #7c3aed;
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+    }
+    .file-upload {
+      border: 2px dashed #cbd5e0;
+      transition: all 0.3s ease;
+    }
+    .file-upload:hover {
+      border-color: #7c3aed;
+      background-color: #f8fafc;
+    }
+    .file-upload.dragover {
+      border-color: #7c3aed;
+      background-color: #f5f3ff;
+    }
+    .btn-upload {
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+    }
+    .btn-upload:hover {
+      transform: translateY(-2px);
+    }
+    .fade-in {
+      animation: fadeIn 0.6s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center px-4 py-8">
+
+  <!-- Navbar Placeholder -->
+  <div id="navbar" class="w-full max-w-4xl mb-8"></div>
+
+  <!-- Upload Card -->
+  <div class="upload-card w-full max-w-2xl bg-white rounded-xl overflow-hidden fade-in">
+    <!-- Card Header -->
+    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 py-6 px-8">
+      <div class="flex items-center justify-center space-x-3">
+        <i class="fas fa-cloud-upload-alt text-white text-2xl"></i>
+        <h2 class="text-2xl font-bold text-white">Ajouter un livre</h2>
+      </div>
+      <p class="text-center text-purple-100 mt-1">Remplissez les détails du livre à ajouter</p>
+    </div>
+    
+    <!-- Card Body -->
+    <div class="p-8">
+      <form id="uploadForm" class="space-y-5" enctype="multipart/form-data">
+        <!-- Titre du livre -->
+        <div class="space-y-1">
+          <label for="title" class="block text-sm font-medium text-gray-700">Titre du livre *</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-book text-gray-400"></i>
+            </div>
+            <input 
+              id="title" 
+              name="title" 
+              type="text" 
+              placeholder="Titre complet du livre" 
+              required
+              class="input-field pl-10 w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200"
+            >
+          </div>
+        </div>
+        
+        <!-- Auteur -->
+        <div class="space-y-1">
+          <label for="author" class="block text-sm font-medium text-gray-700">Auteur *</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-user-edit text-gray-400"></i>
+            </div>
+            <input 
+              id="author" 
+              name="author" 
+              type="text" 
+              placeholder="Nom de l'auteur" 
+              required
+              class="input-field pl-10 w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200"
+            >
+          </div>
+        </div>
+        
+        <!-- Catégorie et Niveau -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="space-y-1">
+            <label for="category" class="block text-sm font-medium text-gray-700">Catégorie *</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-tag text-gray-400"></i>
+              </div>
+              <select 
+                id="category" 
+                name="category" 
+                required
+                class="input-field pl-10 w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200 appearance-none"
+              >
+                <option value="" disabled selected>Sélectionnez une catégorie</option>
+                <option value="Littérature">Littérature</option>
+                <option value="Science">Science</option>
+                <option value="Histoire">Histoire</option>
+                <option value="Mathématiques">Mathématiques</option>
+                <option value="Programmation">Programmation</option>
+                <option value="Économie">Économie</option>
+                <option value="Philosophie">Philosophie</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="space-y-1">
+            <label for="niveau" class="block text-sm font-medium text-gray-700">Niveau scolaire *</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-graduation-cap text-gray-400"></i>
+              </div>
+              <select 
+                id="niveau" 
+                name="niveau" 
+                required
+                class="input-field pl-10 w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200 appearance-none"
+              >
+                <option value="" disabled selected>Sélectionnez un niveau</option>
+                <option value="Seconde">Seconde</option>
+                <option value="Première">Première</option>
+                <option value="Terminale">Terminale</option>
+                <option value="BTS SIO">BTS SIO</option>
+                <option value="BTS SN">BTS SN</option>
+                <option value="Université">Université</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        
+        <!-- ISBN -->
+        <div class="space-y-1">
+          <label for="isbn" class="block text-sm font-medium text-gray-700">ISBN (optionnel)</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-barcode text-gray-400"></i>
+            </div>
+            <input 
+              id="isbn" 
+              name="isbn" 
+              type="text" 
+              placeholder="Numéro ISBN à 10 ou 13 chiffres" 
+              pattern="(?:\d{10}|\d{13})"
+              class="input-field pl-10 w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200"
+            >
+          </div>
+        </div>
+        
+        <!-- Upload de fichier -->
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-700">Fichier du livre *</label>
+          <div 
+            id="fileDropZone" 
+            class="file-upload relative border-2 rounded-lg p-6 text-center cursor-pointer"
+          >
+            <input 
+              id="fileInput" 
+              name="file" 
+              type="file" 
+              accept=".pdf,.epub,.doc,.docx" 
+              required
+              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            >
+            <div class="pointer-events-none">
+              <i class="fas fa-file-upload text-3xl text-purple-500 mb-2"></i>
+              <p class="text-sm text-gray-600">
+                <span class="text-purple-600 font-medium">Cliquez pour sélectionner</span> ou glissez-déposez votre fichier
+              </p>
+              <p class="text-xs text-gray-500 mt-1">
+                Formats acceptés: PDF, EPUB, DOC, DOCX (Max. 20MB)
+              </p>
+              <p id="fileName" class="text-sm font-medium text-gray-900 mt-2 hidden"></p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Bouton de soumission -->
+        <button 
+          type="submit" 
+          id="submitBtn"
+          class="btn-upload w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg shadow-md"
+        >
+          <i class="fas fa-cloud-upload-alt mr-2"></i>Uploader le livre
+        </button>
+      </form>
+      
+      <!-- Message de résultat -->
+      <div id="result" class="mt-4 text-sm p-3 rounded hidden"></div>
+    </div>
+  </div>
+
+  <script src="navbar.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Vérification de l'authentification et du rôle
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      
+      if (!token) {
+        window.location.href = "login.html";
+        return;
+      }
+      
+      if (role !== "admin" && role !== "enseignant") {
+        alert("Accès refusé. Rôle requis: enseignant ou admin.");
+        window.location.href = "explore.html";
+        return;
+      }
+
+      // Éléments DOM
+      const form = document.getElementById('uploadForm');
+      const fileDropZone = document.getElementById('fileDropZone');
+      const fileInput = document.getElementById('fileInput');
+      const fileName = document.getElementById('fileName');
+      const resultDiv = document.getElementById('result');
+      const submitBtn = document.getElementById('submitBtn');
+
+      // Gestion du drag and drop
+      fileDropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        fileDropZone.classList.add('dragover');
+      });
+
+      fileDropZone.addEventListener('dragleave', () => {
+        fileDropZone.classList.remove('dragover');
+      });
+
+      fileDropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileDropZone.classList.remove('dragover');
+        
+        if (e.dataTransfer.files.length) {
+          fileInput.files = e.dataTransfer.files;
+          updateFileName();
+        }
+      });
+
+      fileInput.addEventListener('change', updateFileName);
+
+      function updateFileName() {
+        if (fileInput.files.length) {
+          fileName.textContent = fileInput.files[0].name;
+          fileName.classList.remove('hidden');
+        } else {
+          fileName.classList.add('hidden');
+        }
+      }
+
+      // Soumission du formulaire
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Vérification de la taille du fichier
+        if (fileInput.files[0] && fileInput.files[0].size > 20 * 1024 * 1024) {
+          showResult("Le fichier est trop volumineux (max. 20MB)", false);
+          return;
+        }
+
+        // Afficher l'état de chargement
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Envoi en cours...';
+        submitBtn.disabled = true;
+        
+        try {
+          const formData = new FormData(form);
+          
+          const response = await fetch("http://localhost:8000/books/upload", {
+            method: "POST",
+            body: formData
+          });
+          
+          const result = await response.json();
+          
+          if (response.ok) {
+            showResult(result.message || "Livre uploadé avec succès !", true);
+            form.reset();
+            fileName.classList.add('hidden');
+          } else {
+            showResult(result.detail || "Erreur lors de l'upload du livre", false);
+          }
+        } catch (error) {
+          console.error("Erreur:", error);
+          showResult("Erreur de connexion au serveur", false);
+        } finally {
+          submitBtn.innerHTML = originalBtnText;
+          submitBtn.disabled = false;
+        }
+      });
+
+      function showResult(message, isSuccess) {
+        resultDiv.textContent = message;
+        resultDiv.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'bg-green-50', 'text-green-700');
+        
+        if (isSuccess) {
+          resultDiv.classList.add('bg-green-50', 'text-green-700');
+        } else {
+          resultDiv.classList.add('bg-red-50', 'text-red-700');
+        }
+        
+        // Masquer le message après 5 secondes
+        setTimeout(() => {
+          resultDiv.classList.add('hidden');
+        }, 5000);
+      }
+    });
+  </script>
+</body>
+</html>
