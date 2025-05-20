@@ -22,7 +22,7 @@ Ce projet est une application web de gestion et de consultation de livres numér
 1. Cloner le repo
 
 ```bash
-git clone https://github.com/votre-nom/bibliotheque-numerique.git
+git clone https://github.com/Wambaforestin/bibliotheque-numerique-front-et-backed-stage-epsi.git
 cd bibliotheque-numerique
 ```
 
@@ -32,7 +32,7 @@ cd bibliotheque-numerique
 docker-compose up --build
 ```
 
-3. Accéder à l'application sur [http://localhost:5500](http://localhost:5500)
+3. Accéder à l'application sur [http://localhost:8000](http://localhost:8000)
 
 ## Accès API (FastAPI)
 
