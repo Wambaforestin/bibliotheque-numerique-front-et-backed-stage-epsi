@@ -1,5 +1,3 @@
-![Docker Build](https://img.shields.io/docker/image-size/tonutilisateur/tonimage/latest)
-![Docker Pulls](https://img.shields.io/docker/pulls/tonutilisateur/tonimage)
 # Bibliothèque Numérique - Lycée Professionnel
 
 Ce projet est une application web de gestion et de consultation de livres numériques pour un lycée professionnel. Elle permet aux élèves, enseignants et administrateurs de consulter, télécharger, uploader et gérer les ouvrages disponibles.
